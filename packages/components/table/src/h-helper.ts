@@ -1,5 +1,7 @@
 // @ts-nocheck
 import { h } from 'vue'
+import { addUnit } from '@element-plus/utils'
+
 export function hColgroup(props) {
   const isAuto = props.tableLayout === 'auto'
   let columns = props.columns || []
@@ -16,10 +18,13 @@ export function hColgroup(props) {
     }
     if (isAuto) {
       propsData.style = {
-        width: `${column.width}px`,
+        width: addUnit(`${column.width}px`),
       }
     } else {
       propsData.name = column.id
+      propsData.style = {
+        width: addUnit(`${column.width}px`),
+      }
     }
     return propsData
   }
