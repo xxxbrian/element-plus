@@ -1,3 +1,4 @@
+import { inject } from 'vue'
 import { isNumber, isObject, isString, isStringNumber } from '../types'
 import { isClient } from '../browser'
 import { camelize } from '../strings'
@@ -74,12 +75,31 @@ export const removeStyle = (
   }
 }
 
-export function addUnit(value?: string | number, defaultUnit = 'px') {
+export function addUnit(value?: string | number, defaultUnit = 'vw') {
   if (!value) return ''
+  const viewportWidth = inject('viewportWidth', 1920)
+
   if (isNumber(value) || isStringNumber(value)) {
-    return `${value}${defaultUnit}`
+    return `${((Number(value) / viewportWidth) * 100).toFixed(5)}${defaultUnit}`
   } else if (isString(value)) {
+    const match = value.match(/^([+-]?\d*\.?\d+)([a-zA-Z%]*)$/)
+    if (match) {
+      const [, numStr, unit] = match
+      const num = Number.parseFloat(numStr)
+
+      if (unit === 'px') {
+        return `${((num / viewportWidth) * 100).toFixed(5)}${defaultUnit}`
+      }
+
+      if (unit === '%') {
+        return `${num}${unit}`
+      }
+
+      return `${numStr}${unit}`
+    }
+
     return value
   }
+
   debugWarn(SCOPE, 'binding value must be a string or number')
 }
